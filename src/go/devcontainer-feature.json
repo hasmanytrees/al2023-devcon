@@ -1,0 +1,12 @@
+{
+    "id": "go",
+    "name": "Go lang runtime and development support",
+    "version": "0.0.1",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "golang.Go"
+            ]
+        }
+    }
+}
