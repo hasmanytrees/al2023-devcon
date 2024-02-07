@@ -1,5 +1,6 @@
 {
     "id": "aws-amplify-cli",
     "name": "AWS Amplify CLI",
-    "version": "0.0.1"
+    "version": "0.0.1",
+    "installsAfter": ["ghcr.io/hasmanytrees/al2023-devcon/awscli"]
 }
