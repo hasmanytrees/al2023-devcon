@@ -4,17 +4,50 @@ name: Create and Publish Docker Image
 on:
   workflow_dispatch:
 
-# There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
-jobs:
-  build-and-push-image:
-    runs-on: ubuntu-latest
+permissions: 
+  packages: write
 
+jobs:
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Log in to the Container registry
-        run: echo ${{ secrets.CR_PAT}} | docker login ghcr.io -u hasmanytrees --password-stdin
-      - name: Build and push Docker image
-        run: |
-          docker build -t ghcr.io/hasmanytrees/al2023-devcon:latest .
-          docker push ghcr.io/hasmanytrees/al2023-devcon:latest
+      # Get the repository's code
+      - name: Checkout
+        uses: actions/checkout@v2
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/hasmanytrees/al2023-devcon:latest
+
+
+# There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
+# jobs:
+#   build-and-push-image:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+#       - name: Log in to the Container registry
+#         run: echo ${{ secrets.CR_PAT}} | docker login ghcr.io -u hasmanytrees --password-stdin
+      # - name: Build and push Docker image
+      #   run: |
+      #     docker build -t ghcr.io/hasmanytrees/al2023-devcon:latest .
+      #     docker push ghcr.io/hasmanytrees/al2023-devcon:latest
